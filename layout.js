@@ -47,12 +47,22 @@ function renderFooter(containerId, options = {}) {
                 </div>
             </div>
 
-            <div class="footer-col">
+            <div class="footer-col" id="sponsor-col" style="display:none;">
                 <h3>Sponsored By</h3>
-                <div class="sponsor-grid">
+                <div class="sponsor-grid" id="sponsor-grid">
                 </div>
             </div>
         </div>
+        <script>
+            // Auto-hide sponsor section if empty
+            setTimeout(() => {
+                const sGrid = document.getElementById('sponsor-grid');
+                const sCol = document.getElementById('sponsor-col');
+                if(sGrid && sCol && sGrid.children.length > 0) {
+                    sCol.style.display = 'block';
+                }
+            }, 0);
+        </script>
 
         <div class="copyright">
             &copy; 2025 UCL Civil Engineering Society. Not officially affiliated with UCL CEGE Dept.
