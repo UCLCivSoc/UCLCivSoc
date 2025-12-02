@@ -45,5 +45,3 @@ const reports = [
 const committee = [
 //COMMITTEE MEMBERS
 ];
-
-
