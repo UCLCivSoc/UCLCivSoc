@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCL CivSoc | Design Competitions</title>
+
+    <link rel="icon" type="image/png" href="images/website/civsoclogo.png">
+<link rel="apple-touch-icon" href="images/website/civsoclogo.png">
+    
+<link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="submission.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="intro-sequence">
+        <div class="intro-word" id="word-1">TERMLY</div>
+        <div class="intro-word" id="word-2">DESIGN</div>
+        <div class="intro-word" id="word-3">CONTEST</div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <nav>
+        <div class="logo" onclick="window.location.href='../index.html'"> 
+            <div class="logo-container"><img src="../images/website/civsoclogo.png" class="nav-logo-img"></div>
+            Est. 2016
+        </div>
+        <div class="nav-group">
+            <a href="rulebook.html" class="nav-btn" style="margin-right: 10px;"><span>Rules</span></a>
+            <a href="../index.html" class="nav-btn back-mode"><span>← Back to News</span></a>
+        </div>
+    </nav>
+
+    <div class="comp-hero" id="hero-section">
+        <div class="hero-content-wrapper">
+            <div class="theme-pill" id="hero-pill">Current Challenge</div>
+            <h1 class="hero-title" id="hero-title">SUSTAINABLE<br>SKYSCRAPER</h1>
+            
+            <div id="status-indicator"></div>
+            <div id="countdown-timer">Loading...</div>
+
+            <div class="category-tabs">
+                <button class="cat-btn active" id="tab-ind" onclick="switchCategory('individual')">
+                    <i class="fas fa-user"></i> Individual
+                </button>
+                <button class="cat-btn" id="tab-team" onclick="switchCategory('team')">
+                    <i class="fas fa-users"></i> Teams
+                </button>
+            </div>
+
+            <div class="prize-grid" id="prizes-display"></div>
+            
+            <p class="hero-subtitle" id="hero-desc">
+                Design a high-rise structure that incorporates green energy solutions.
+            </p>
+            
+            <button id="hero-submit-btn" class="hero-btn" onclick="openUploadModal()">
+                <i class="fas fa-paper-plane"></i> Submit Entry
+            </button>
+        </div>
+
+        <div class="scroll-indicator" onclick="document.getElementById('entries-grid').scrollIntoView({behavior: 'smooth'})">
+            <span>Scroll to View Entries</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+
+    <div class="comp-grid" id="entries-grid"></div>
+
+    <div id="results-view" style="display: none;">
+        <div class="confetti-container">
+            <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+            <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+        </div>
+
+        <div class="results-header">
+            <h2 class="results-title">🏆 CONGRATULATIONS 🏆</h2>
+            <p class="results-subtitle">The votes are in. Here are your Term 1 winners.</p>
+        </div>
+        
+        <div class="podium-container" id="podium-grid"></div>
+
+        <div class="special-awards-container">
+            <div class="special-section">
+                <h3 class="special-title"><i class="fas fa-star"></i> Committee Awards</h3>
+                <div class="special-grid" id="committee-grid"></div>
+            </div>
+            <div class="special-section">
+                <h3 class="special-title"><i class="fas fa-thumbs-up"></i> Honorable Mentions</h3>
+                <div class="special-grid" id="runners-up-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="comp-modal-overlay" id="detail-modal">
+        <div class="comp-modal-box">
+            <div class="close-modal" onclick="closeDetailModal()">✕</div>
+            
+            <div class="modal-left" id="modal-gallery"></div>
+            
+            <div class="modal-right">
+                <div id="modal-cat-badge" class="cat-badge">INDIVIDUAL</div>
+                <h2 id="modal-title">Title</h2>
+                <div class="modal-meta-row">
+                    <span id="modal-author">Author Name</span> • <span id="modal-software" style="color:var(--ucl-purple); font-weight:bold;">Software</span>
+                </div>
+
+                
+                <h3 class="modal-label">Design Statement</h3>
+                <p id="modal-desc">Description...</p>
+                
+                <button id="modal-vote-btn" class="modal-action-btn">▲ Cast Vote</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="comp-modal-overlay" id="upload-modal" style="align-items: center;">
+        <div class="comp-modal-box upload-layout">
+            
+            <div class="upload-form-side">
+                <h2 style="margin-bottom: 1.5rem; color: var(--ucl-purple);">Submit Entry</h2>
+                
+                <div class="form-cat-select">
+                    <label>Category</label>
+                    <select id="inp-category" onchange="toggleTeamFields(); updatePreview();">
+                        <option value="individual">Individual</option>
+                        <option value="team">Team (2-4 Members)</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:15px;">
+                    <div style="flex:1;">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" id="inp-title" class="form-input" placeholder="e.g. The Green Spire" oninput="updatePreview()">
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">Software Used</label>
+                        <input type="text" id="inp-software" class="form-input" placeholder="e.g. Revit, Rhino" oninput="updatePreview()">
+                    </div>
+                </div>
+                
+                <div id="field-individual">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" id="inp-author" class="form-input" placeholder="e.g. John Doe" oninput="updatePreview()">
+                </div>
+
+                <div id="field-team" style="display:none;">
+                    <label class="form-label">Team Name</label>
+                    <input type="text" id="inp-team-name" class="form-input" placeholder="e.g. Structural Squad" oninput="updatePreview()">
+                    <label class="form-label">Member Names</label>
+                    <input type="text" id="inp-members" class="form-input" placeholder="Alice, Bob, Charlie..." oninput="updatePreview()">
+                </div>
+
+                <label class="form-label">Project Images (Max 5)</label>
+                <div class="file-upload-box" id="drop-zone-img">
+                    <i class="fas fa-images" style="font-size: 1.5rem; margin-bottom: 5px;"></i><br>
+                    <span id="file-name-display">Click or Drag Images Here</span>
+                    <input type="file" id="inp-file" accept="image/*" multiple>
+                </div>
+
+                <label class="form-label" style="margin-top:1.5rem;">Description</label>
+                <textarea id="inp-desc" class="form-textarea" placeholder="Describe your concept..." oninput="updatePreview()"></textarea>
+                
+                <div style="margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 10px;">
+                    <input type="checkbox" id="inp-pledge" style="margin-top: 5px;">
+                    <label for="inp-pledge" style="font-size: 0.85rem; color: #555; line-height: 1.4;">
+                        I certify that this design is my own original work.
+                    </label>
+                </div>
+
+                <button onclick="submitEntry()" class="submit-btn">SUBMIT DESIGN</button>
+                <button onclick="closeUploadModal()" class="cancel-btn">Cancel</button>
+            </div>
+
+            <div class="upload-preview-side">
+                <h3 class="preview-header">Live Preview</h3>
+                <div class="preview-container">
+                    <div class="entry-card preview-card">
+                        
+                        <div class="preview-gallery" id="prev-gallery">
+                            <img src="../images/website/civsoclogo.png" id="prev-img-main">
+                            </div>
+
+                        <div class="entry-info">
+                            <div class="entry-title" id="prev-title">Project Title</div>
+                            <div class="entry-meta"><i class="fas fa-user-circle"></i> <span id="prev-author">Author Name</span></div>
+                            
+
+                            <div style="font-size:0.8rem; color:#666; margin-top:5px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" id="prev-desc">
+                                Description preview...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align:center; font-size:0.8rem; color:#888; margin-top:1rem;">
+                    This is how your entry will appear in the gallery.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="../layout.js"></script>
+    <script>
+        renderFooter('footer-placeholder', { rootPath: '../', withPillars: false });
+    </script>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+<script src="config.js"></script>
+<script src="script.js"></script> </body>
+</html>

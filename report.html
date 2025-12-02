@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCL CivSoc | Civil Engineering Society</title>
+
+    <link rel="icon" type="image/png" href="images/website/civsoclogo.png">
+<link rel="apple-touch-icon" href="images/website/civsoclogo.png">
+    
+    <meta name="description" content="Official website of the UCL Civil Engineering Society (CivSoc). News, events, committee contacts, and transparency reports.">
+    <meta name="keywords" content="UCL, CivSoc, Civil Engineering, Society, Students Union, London, Engineering">
+    <meta name="author" content="UCL CivSoc Committee">
+    
+    <meta property="og:title" content="UCL CivSoc | News & Reports">
+    <meta property="og:description" content="Stay updated with the latest socials, career events, and committee transparency reports.">
+    <meta property="og:image" content="images/website/civsoclogo.png"> <meta property="og:url" content="https://ucl-civsoc.github.io/"> <meta property="og:type" content="website">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #f4f4f4;"> <nav>
+        <div class="logo" onclick="window.location.href='index.html'"> 
+            <div class="logo-container"><img src="images/website/civsoclogo.png" class="nav-logo-img"></div>
+            Est. 2016
+        </div>
+        <div class="nav-group">
+            <a href="index.html" class="nav-btn back-mode"><span>← Back to News</span></a>
+        </div>
+    </nav>
+
+    <div class="report-layout" style="margin-top: 2rem;">
+        <div class="report-sidebar" id="report-sidebar"></div>
+        <div class="report-content" id="report-content"></div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="layout.js"></script>
+    <script>
+        renderFooter('footer-placeholder', { withPillars: false });
+    </script>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', renderReportPage);
+    </script>
+</body>
+</html>
