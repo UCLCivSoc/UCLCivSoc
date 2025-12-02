@@ -36,7 +36,6 @@ content: `
 </ul>
 `
 },
-C
    
 ];
 const reports = [
@@ -46,4 +45,5 @@ const reports = [
 const committee = [
 //COMMITTEE MEMBERS
 ];
+
 
