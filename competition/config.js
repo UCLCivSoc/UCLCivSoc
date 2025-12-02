@@ -2,6 +2,11 @@ const CONFIG = {
     // --- 1. FREQUENCY SWITCH ---
     collection_id: "term_1_2025", 
 
+cloudinary: {
+        cloudName: "YOUR_CLOUD_NAME_HERE", // e.g., "dxy88..."
+        uploadPreset: "civsoc_preset"      // The one you just created
+    },
+    
     // --- 2. TIMELINE ---
     // Set to FUTURE date to see "Submit" mode
     // Set to PAST date to see "Results" mode
@@ -59,3 +64,4 @@ const firebaseConfig = {
   appId: "1:616984338580:web:c420d1d0594594b7e69481"
 
 };
+
