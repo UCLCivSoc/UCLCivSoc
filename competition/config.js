@@ -2,7 +2,7 @@ const CONFIG = {
     // --- 1. FREQUENCY SWITCH ---
     collection_id: "test", 
 
-cloudinary: {
+    cloudinary: {
         cloudName: "dji5fn0me", // e.g., "dxy88..."
         uploadPreset: "civsoc_preset"      // The one you just created
     },
@@ -49,21 +49,12 @@ cloudinary: {
     },
 
     // --- 5. FIREBASE ---
-const firebaseConfig = {
-
-  apiKey: "AIzaSyBnVixoZ0JYRV46EkDQa9XLumUfSmrfWVk",
-
-  authDomain: "contest-c8877.firebaseapp.com",
-
-  projectId: "contest-c8877",
-
-  storageBucket: "contest-c8877.firebasestorage.app",
-
-  messagingSenderId: "616984338580",
-
-  appId: "1:616984338580:web:c420d1d0594594b7e69481"
-
+    firebaseConfig: {
+        apiKey: "AIzaSyBnVixoZ0JYRV46EkDQa9XLumUfSmrfWVk",
+        authDomain: "contest-c8877.firebaseapp.com",
+        projectId: "contest-c8877",
+        storageBucket: "contest-c8877.firebasestorage.app",
+        messagingSenderId: "616984338580",
+        appId: "1:616984338580:web:c420d1d0594594b7e69481"
+    }
 };
-
-
-

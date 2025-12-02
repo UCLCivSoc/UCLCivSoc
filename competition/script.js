@@ -158,7 +158,8 @@ async function submitEntry() {
     
     // Get inputs
     const imageFiles = document.getElementById('inp-file').files; // From input
-    const urlImg = document.getElementById('inp-img-url').value; // From URL paste
+    const urlImgInput = document.getElementById('inp-img-url');
+    const urlImg = urlImgInput ? urlImgInput.value : ""; // From URL paste (safely handled)
 
     // Determine Author
     let authorName = "";
