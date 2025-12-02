@@ -128,69 +128,94 @@ function updatePreview() {
 }
 
 // --- SUBMIT LOGIC (No PDF) ---
+// --- NEW: Upload Logic using Cloudinary ---
+async function uploadToCloudinary(file) {
+    const url = `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/image/upload`;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
+
+    try {
+        const res = await fetch(url, { method: 'POST', body: formData });
+        const data = await res.json();
+        return data.secure_url; // Returns the web link to the image
+    } catch (error) {
+        console.error("Cloudinary Error:", error);
+        throw new Error("Image upload failed");
+    }
+}
+
+// --- SUBMIT LOGIC ---
 async function submitEntry() {
-    if (currentState !== "SUBMITTING") return showToast("Submissions Closed", "error");
+    if(currentState !== "SUBMITTING") return showToast("Submissions Closed", "error");
     
     const type = document.getElementById('inp-category').value;
     const title = document.getElementById('inp-title').value;
     const software = document.getElementById('inp-software').value;
     const desc = document.getElementById('inp-desc').value;
     const pledge = document.getElementById('inp-pledge').checked;
+    
+    // Get inputs
+    const imageFiles = document.getElementById('inp-file').files; // From input
+    const urlImg = document.getElementById('inp-img-url').value; // From URL paste
 
+    // Determine Author
     let authorName = "";
-    if (type === 'individual') {
+    if(type === 'individual') {
         authorName = document.getElementById('inp-author').value;
-        if (!authorName) return showToast("Please enter your name", "error");
     } else {
         const tName = document.getElementById('inp-team-name').value;
         const members = document.getElementById('inp-members').value;
-        if (!tName || !members) return showToast("Team details missing", "error");
+        if(!tName || !members) return showToast("Team details missing", "error");
         authorName = `${tName} (${members})`;
     }
 
-    // Validation
-    const hasFile = uploadedImageFiles && uploadedImageFiles.length > 0;
-    
-    if (!title || !authorName || !software || !hasFile) {
-        return showToast("Missing fields or image", "error");
-    }
-    if (!pledge) return showToast("Please certify originality", "error");
+    // Priority: 1. Dragged Files, 2. Selected Files, 3. URL
+    const finalFiles = uploadedImageFiles || (imageFiles.length > 0 ? imageFiles : null);
+    const hasImage = finalFiles || (urlImg.length > 5);
+
+    if(!title || !authorName || !software || !hasImage) return showToast("Missing fields or image", "error");
+    if(!pledge) return showToast("Please certify originality", "error");
 
     if (currentCategory !== type) switchCategory(type);
 
-    const entryData = { title, author: authorName, software, desc, type, images: [] };
+    showToast("Uploading Images... Please wait.");
 
-    // --- DEMO MODE ---
-    if (!db) {
-        let imageUrls = [];
-        if (hasFile) {
-            const imgPromises = Array.from(uploadedImageFiles).map(file => readFile(file));
-            imageUrls = await Promise.all(imgPromises);
-        }
-        
-        saveEntry({ ...entryData, images: imageUrls });
-        return;
-    }
-
-    // --- FIREBASE UPLOAD ---
-    showToast("Uploading... Please wait.");
     try {
-        const collectionName = CONFIG.collection_id || "competitions";
-        
-        // Upload Images
-        let imageUrls = [];
-        if (hasFile) {
-            const imgUploads = Array.from(uploadedImageFiles).map(file => {
-                const ref = storage.ref(`${collectionName}/images/${Date.now()}_${file.name}`);
-                return ref.put(file).then(s => s.ref.getDownloadURL());
-            });
-            imageUrls = await Promise.all(imgUploads);
+        let finalImageUrls = [];
+
+        // CASE A: File Upload (Send to Cloudinary)
+        if (finalFiles) {
+            // Limit to 5 images
+            const filesToUpload = Array.from(finalFiles).slice(0, 5);
+            
+            // Upload all images in parallel
+            const uploadPromises = filesToUpload.map(file => uploadToCloudinary(file));
+            finalImageUrls = await Promise.all(uploadPromises);
+        } 
+        // CASE B: URL Paste
+        else {
+            finalImageUrls = [urlImg];
         }
 
-        saveEntry({ ...entryData, images: imageUrls }, true);
+        // Prepare Data
+        const entryData = { 
+            title, 
+            author: authorName, 
+            software, 
+            desc, 
+            type, 
+            images: finalImageUrls, // Saves the Cloudinary Links
+            pdf: "" // PDF removed as requested
+        };
 
-    } catch(e) {
-        showToast("Upload failed: " + e.message, "error");
+        // Save to Database (or Grid if Demo)
+        saveEntry(entryData, !!db);
+
+    } catch (e) {
+        console.error(e);
+        showToast("Error: " + e.message, "error");
     }
 }
 
