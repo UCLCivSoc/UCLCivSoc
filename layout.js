@@ -40,9 +40,9 @@ function renderFooter(containerId, options = {}) {
             <div class="footer-col">
                 <h3>Connect</h3>
                 <div class="social-links">
-                    <a href="#">Instagram</a>
-                    <a href="#">LinkedIn</a>
-                    <a href="#">WhatsApp</a>
+<a href="https://www.instagram.com/uclcivsoc/">Instagram</a>
+                    <a href="https://www.linkedin.com/company/ucl-civil-engineering-society/posts/?feedView=all">LinkedIn</a>
+                    <a href="https://chat.whatsapp.com/FyZ1POz8QzxLmMkpISIjqx">WhatsApp</a>
                     <a href="mailto:su.civil.engineering@ucl.ac.uk">Email Us</a>
                 </div>
             </div>
