@@ -10,7 +10,7 @@ cloudinary: {
     // --- 2. TIMELINE ---
     // Set to FUTURE date to see "Submit" mode
     // Set to PAST date to see "Results" mode
-    end_date: "2025-11-30T23:59:59", 
+    end_date: "2025-12-30T23:59:59", 
     results_duration_days: 7,
 
     // --- 3. BLIND VOTING ---
@@ -64,5 +64,6 @@ const firebaseConfig = {
   appId: "1:616984338580:web:c420d1d0594594b7e69481"
 
 };
+
 
 
