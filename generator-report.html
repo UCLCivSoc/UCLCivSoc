@@ -66,9 +66,6 @@
             
             <div class="row">
                 <div><label>Attendance</label><input type="text" id="s-attend" placeholder="12/14" oninput="update()"></div>
-                <div><label>Total Spent</label><input type="text" id="s-spent" placeholder="£50.00" oninput="update()"></div>
-            </div>
-            <div class="row">
                 <div><label>Topics Discussed</label><input type="text" id="s-discuss" placeholder="3" oninput="update()"></div>
                 <div><label>Decisions Made</label><input type="text" id="s-decision" placeholder="2" oninput="update()"></div>
             </div>
@@ -77,12 +74,6 @@
 
     <div id="view-details" class="view-section">
         <div class="container glass-panel">
-            <label>Finances</label>
-            <div id="finance-list"></div>
-            <button class="btn-add" onclick="addFin()">+ Add Transaction</button>
-            
-            <hr style="border:0; border-top:1px solid #333; margin: 30px 0;">
-
             <label>Minutes</label>
             <div id="minute-list"></div>
             <button class="btn-add" onclick="addMin()">+ Add Minute Bullet</button>
@@ -104,7 +95,6 @@
             db = firebase.firestore();
         });
 
-        let fins = [];
         let mins = [""];
 
         function switchTab(id, btn) {
@@ -115,26 +105,9 @@
             update();
         }
 
-        function addFin() { fins.push({item:"", cat:"", amt:"", type:"negative"}); renderLists(); }
         function addMin() { mins.push(""); renderLists(); }
         
         function renderLists() {
-            const fDiv = document.getElementById('finance-list');
-            fDiv.innerHTML = '';
-            fins.forEach((f, i) => {
-                fDiv.innerHTML += `
-                <div class="list-item">
-                    <input style="margin:0" placeholder="Item" value="${f.item}" oninput="fins[${i}].item=this.value;update()">
-                    <input style="margin:0" placeholder="Category" value="${f.cat}" oninput="fins[${i}].cat=this.value;update()">
-                    <input style="margin:0" placeholder="£0.00" value="${f.amt}" oninput="fins[${i}].amt=this.value;update()">
-                    <select style="margin:0; width:auto;" onchange="fins[${i}].type=this.value;update()">
-                        <option value="negative" ${f.type=='negative'?'selected':''}>Cost</option>
-                        <option value="positive" ${f.type=='positive'?'selected':''}>Income</option>
-                    </select>
-                    <button class="btn-del" onclick="fins.splice(${i},1);renderLists();update()">X</button>
-                </div>`;
-            });
-
             const mDiv = document.getElementById('minute-list');
             mDiv.innerHTML = '';
             mins.forEach((m, i) => {
@@ -151,15 +124,11 @@
                 id: document.getElementById('id').value || "report-" + Date.now(),
                 label: document.getElementById('label').value,
                 att: document.getElementById('s-attend').value,
-                spd: document.getElementById('s-spent').value,
                 dis: document.getElementById('s-discuss').value,
                 dec: document.getElementById('s-decision').value
             };
 
             // Preview HTML
-            let finH = fins.length ? `<div class="data-section"><h3>Treasury</h3><table class="transparency-table">` + 
-                fins.map(f => `<tr><td>${f.item}<br><small>${f.cat}</small></td><td class="amount ${f.type}">${f.amt}</td></tr>`).join('') + `</table></div>` : '';
-            
             let minH = `<div class="data-section"><h3>Minutes</h3><ul>` + mins.map(m=>`<li>${m}</li>`).join('') + `</ul></div>`;
 
             document.getElementById('preview-box').innerHTML = `
@@ -168,16 +137,14 @@
                     <div class="stat-box"><span class="stat-number">${s.att}</span><span class="stat-label">Present</span></div>
                     <div class="stat-box"><span class="stat-number">${s.dis}</span><span class="stat-label">Topics</span></div>
                     <div class="stat-box"><span class="stat-number">${s.dec}</span><span class="stat-label">Decisions</span></div>
-                    <div class="stat-box"><span class="stat-number">${s.spd}</span><span class="stat-label">Spent</span></div>
                 </div>
-                ${finH} ${minH}`;
+                ${minH}`;
 
             // JSON Object for saving
             let obj = {
                 id: s.id,
                 label: s.label,
-                stats: { attendance: s.att, spent: s.spd, discussion: s.dis, decisions: s.dec },
-                finances: fins.map(f => ({ item: f.item, category: f.cat, amount: f.amt, type: f.type })),
+                stats: { attendance: s.att, discussion: s.dis, decisions: s.dec },
                 minutes: mins,
                 createdAt: new Date().toISOString()
             };

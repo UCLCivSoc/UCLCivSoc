@@ -64,7 +64,6 @@
         <div class="container glass-panel">
             <label>Full Name</label><input type="text" id="name" placeholder="Name" oninput="update()">
             <label>Role</label><input type="text" id="role" placeholder="Role" oninput="update()">
-            <label>Email</label><input type="text" id="email" placeholder="@ucl.ac.uk" oninput="update()">
             <label>LinkedIn (Optional)</label><input type="text" id="linkedin" placeholder="https://linkedin.com..." oninput="update()">
             
             <label>Image Path</label>
@@ -133,7 +132,6 @@
             const d = {
                 name: document.getElementById('name').value || "Name",
                 role: document.getElementById('role').value || "Role",
-                email: document.getElementById('email').value,
                 linkedin: document.getElementById('linkedin').value,
                 image: document.getElementById('image').value,
                 bio: document.getElementById('bio').value || "Bio goes here."
@@ -141,7 +139,7 @@
 
             const linkBtn = d.linkedin 
                 ? `<a href="#" class="member-email" style="color:#0077b5;border-color:#0077b5">Linked<strong>in</strong></a>` 
-                : `<a href="#" class="member-email">Email</a>`;
+                : ``;
 
             document.getElementById('preview-box').innerHTML = `
                 <div class="member-card">
@@ -157,7 +155,6 @@
             let obj = {
                 name: d.name,
                 role: d.role,
-                email: d.email,
                 image: d.image,
                 bio: d.bio,
                 createdAt: new Date().toISOString()
