@@ -345,7 +345,12 @@ function initReportsAndCommittee() {
     if(cGrid && typeof committee !== 'undefined') {
         cGrid.innerHTML = ''; committee.forEach(m => {
             const c = document.createElement('div'); c.className = 'member-card';
-            let btn = m.linkedin ? `<a href="${m.linkedin}" target="_blank" class="member-email" style="color:#0077b5;border-color:#0077b5">Linked<strong>in</strong></a>` : `<a href="mailto:${m.email}" class="member-email">Email</a>`;
+            let btn = '';
+            if (m.linkedin) {
+                btn = `<a href="${m.linkedin}" target="_blank" class="member-email" style="color:#0077b5;border-color:#0077b5">Linked<strong>in</strong></a>`;
+            } else if (m.email) {
+                btn = `<a href="mailto:${m.email}" class="member-email">Email</a>`;
+            }
             c.innerHTML = `<div class="member-img-box"><img src="${m.image}" class="member-img"></div><div class="member-info"><div class="member-role">${m.role}</div><div class="member-name">${m.name}</div><div class="member-bio">${m.bio}</div>${btn}</div>`;
             cGrid.appendChild(c);
         });

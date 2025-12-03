@@ -8,7 +8,7 @@
    ticketStatus options: "On Sale", "Selling Fast", "Limited", "Sold Out"
    eventDate format: "YYYY-MM-DD" (Required for 'Next Event' box)
 */
-const posts = [
+var posts = [
 //POSTS GO HERE
 
 {
@@ -38,11 +38,11 @@ content: `
 },
    
 ];
-const reports = [
+var reports = [
 //MEETING MINUTES
 ];
 
-const committee = [
+var committee = [
 //COMMITTEE MEMBERS
 ];
 

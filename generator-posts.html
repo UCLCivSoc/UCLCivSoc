@@ -369,8 +369,8 @@
             });
         }
 
-        function updBlock(i, v) { blocks[i].val = v; renderBlocks(); updateJSON(); }
-        function updList(i, li, v) { blocks[i].val[li] = v; }
+        function updBlock(i, v) { blocks[i].val = v; updateJSON(); }
+        function updList(i, li, v) { blocks[i].val[li] = v; updateJSON(); }
         function addList(i) { blocks[i].val.push(''); renderBlocks(); }
         function delList(i, li) { blocks[i].val.splice(li, 1); renderBlocks(); }
         function delBlock(i) { blocks.splice(i, 1); renderBlocks(); }
