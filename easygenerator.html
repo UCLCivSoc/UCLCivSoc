@@ -97,9 +97,63 @@
         }
         .back-btn:hover { color: white; }
 
+        /* --- INTRO ANIMATION --- */
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            overflow: hidden; pointer-events: none;
+        }
+        
+        .intro-bolt {
+            font-size: 5rem; color: var(--accent);
+            animation: bolt-sequence 3s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+            position: absolute; z-index: 2;
+        }
+
+        .intro-text {
+            color: white; font-weight: 900; font-size: 2rem; 
+            text-transform: uppercase; letter-spacing: 5px;
+            margin-top: 120px; /* Offset from center where bolt is */
+            animation: text-pulse-fade 2s ease-in-out forwards;
+            z-index: 1;
+        }
+
+        @keyframes text-pulse-fade {
+            0%, 60% { opacity: 1; transform: scale(1); text-shadow: 0 0 20px rgba(246, 190, 0, 0.5); }
+            50% { transform: scale(1.05); text-shadow: 0 0 40px rgba(246, 190, 0, 0.8); }
+            100% { opacity: 0; transform: scale(0.9); }
+        }
+
+        @keyframes bolt-sequence {
+            0%, 50% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(246, 190, 0, 0.6)); }
+            60% { transform: scale(1); }
+            100% { transform: scale(100); filter: drop-shadow(0 0 0 rgba(246, 190, 0, 0)); opacity: 0; }
+        }
+
+        @keyframes overlay-fade {
+            0%, 80% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        #intro-overlay.finished { display: none; }
+
     </style>
 </head>
 <body>
+
+    <div id="intro-overlay">
+        <div class="intro-bolt">⚡</div>
+        <div class="intro-text">Easy Generator</div>
+    </div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('intro-overlay').style.animation = "overlay-fade 0.5s ease-out forwards";
+            setTimeout(() => {
+                document.getElementById('intro-overlay').classList.add('finished');
+            }, 500);
+        }, 2800);
+    </script>
 
     <a href="admin.html" class="back-btn">← RETURN TO ADMIN</a>
 
