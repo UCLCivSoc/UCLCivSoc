@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sponsor Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --bg-dark: #0f0f13; --panel: rgba(30, 30, 35, 0.6); --accent: #F6BE00; --text: #eee; --border: rgba(255,255,255,0.1); }
+        body { background: var(--bg-dark); background-image: radial-gradient(circle at 10% 90%, rgba(80, 7, 120, 0.15) 0%, transparent 40%); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .back-link { color: #888; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
+        .back-link:hover { color: white; }
+        .nav-title { font-weight: 900; letter-spacing: 1px; }
+
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .glass-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 30px; backdrop-filter: blur(20px); }
+
+        input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 20px; box-sizing: border-box; font-size: 1rem; }
+        input:focus { border-color: var(--accent); outline: none; background: rgba(0,0,0,0.5); }
+        label { color: var(--accent); font-weight: 800; font-size: 0.75rem; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .upload-area { 
+            border: 2px dashed #444; border-radius: 8px; padding: 40px; text-align: center; 
+            margin-bottom: 20px; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.2);
+        }
+        .upload-area:hover { border-color: var(--accent); background: rgba(255,255,255,0.05); }
+        .upload-area p { margin: 0; color: #888; font-size: 0.9rem; }
+        
+        button.action-btn { 
+            width: 100%; padding: 18px; background: var(--accent); color: black; font-weight: 900; 
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; text-transform: uppercase; 
+            transition: transform 0.2s; 
+        }
+        button.action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(246, 190, 0, 0.4); }
+        button.action-btn:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .preview-img { max-width: 100%; max-height: 100px; margin-top: 10px; display: none; object-fit: contain; background: white; padding: 10px; border-radius: 4px; }
+        
+        #status-msg { margin-top: 20px; text-align: center; font-weight: bold; min-height: 1.2em; }
+        .success { color: #00e676; }
+        .error { color: #ff4444; }
+    </style>
+    
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="easygenerator.html" class="back-link">← Return to Hub</a>
+        <div class="nav-title">SPONSOR EDITOR</div>
+        <button onclick="logout()" style="background:transparent; border:1px solid #444; color:#888; padding:5px 10px; border-radius:4px; cursor:pointer;">Logout</button>
+    </nav>
+
+    <div class="container glass-panel">
+        <label>Sponsor Name</label>
+        <input type="text" id="s-name" placeholder="Company Name">
+
+        <label>Website URL</label>
+        <input type="text" id="s-url" placeholder="https://...">
+
+        <label>Logo Upload</label>
+        <div class="upload-area" onclick="document.getElementById('file-input').click()">
+            <p>Click to select logo (PNG/SVG)</p>
+            <img id="logo-preview" class="preview-img">
+        </div>
+        <input type="file" id="file-input" style="display:none" accept="image/*" onchange="handleFileSelect(this)">
+
+        <button class="action-btn" id="save-btn" onclick="saveSponsor()">Add Sponsor</button>
+        <div id="status-msg"></div>
+    </div>
+
+    <script>
+        // Init Auth
+        let db;
+        checkAuth((user) => {
+            db = firebase.firestore();
+        });
+
+        let selectedFile = null;
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('logo-preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.querySelector('.upload-area p').style.display = 'none';
+                }
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        async function saveSponsor() {
+            const name = document.getElementById('s-name').value;
+            const url = document.getElementById('s-url').value;
+            const btn = document.getElementById('save-btn');
+            const msg = document.getElementById('status-msg');
+
+            if (!name || !url || !selectedFile) {
+                msg.innerText = "Please fill all fields and select a logo.";
+                msg.className = "error";
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Uploading...";
+            msg.innerText = "";
+
+            try {
+                // 1. Upload to Cloudinary
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                formData.append('upload_preset', CIVSOC_CONFIG.cloudinary.uploadPreset);
+
+                const cRes = await fetch(`https://api.cloudinary.com/v1_1/${CIVSOC_CONFIG.cloudinary.cloudName}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const cData = await cRes.json();
+                
+                if (!cData.secure_url) throw new Error("Image upload failed");
+
+                // 2. Save to Firebase
+                btn.innerText = "Saving...";
+                await db.collection("sponsors").add({
+                    name: name,
+                    url: url,
+                    logo: cData.secure_url,
+                    createdAt: new Date().toISOString()
+                });
+
+                msg.innerText = "Sponsor added successfully!";
+                msg.className = "success";
+                
+                // Reset form
+                document.getElementById('s-name').value = '';
+                document.getElementById('s-url').value = '';
+                document.getElementById('logo-preview').src = '';
+                document.getElementById('logo-preview').style.display = 'none';
+                document.querySelector('.upload-area p').style.display = 'block';
+                selectedFile = null;
+
+            } catch (err) {
+                console.error(err);
+                msg.innerText = "Error: " + err.message;
+                msg.className = "error";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Add Sponsor";
+            }
+        }
+    </script>
+</body>
+</html>

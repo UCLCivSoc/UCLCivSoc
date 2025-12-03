@@ -123,6 +123,11 @@
     <button id="back-to-top-btn" onclick="scrollToTop()">↑</button>
     
     <div id="footer-placeholder"></div>
+    <!-- Firebase SDK (Must be before script.js) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
     <script src="layout.js"></script>
     <script>
         renderFooter('footer-placeholder', { withPillars: true });

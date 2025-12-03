@@ -1,12 +1,62 @@
 /*******************************************************
  * INITIALIZATION & HELPERS
  *******************************************************/
+
+// --- FETCH DATA FROM FIREBASE ---
+async function fetchData() {
+    if(!window.firebase) {
+        // Fallback to static data if firebase not loaded yet
+        console.warn("Firebase not loaded, using static data fallback.");
+        return;
+    }
+    const db = firebase.firestore();
+
+    try {
+        // 1. POSTS
+        const pSnap = await db.collection('posts').get();
+        if(!pSnap.empty) {
+            // Overwrite global posts array
+            // Assuming global scope access or we can attach to window
+            window.posts = [];
+            pSnap.forEach(doc => window.posts.push({ id: doc.id, ...doc.data() }));
+        }
+
+        // 2. COMMITTEE
+        const cSnap = await db.collection('committee').get();
+        if(!cSnap.empty) {
+            window.committee = [];
+            cSnap.forEach(doc => window.committee.push({ id: doc.id, ...doc.data() }));
+        }
+
+        // 3. REPORTS
+        const rSnap = await db.collection('reports').orderBy('createdAt', 'desc').get();
+        if(!rSnap.empty) {
+            window.reports = [];
+            rSnap.forEach(doc => window.reports.push({ id: doc.id, ...doc.data() }));
+        }
+
+        // 4. SPONSORS (handled in layout.js mostly, but we can pre-fetch if needed)
+        
+    } catch(e) {
+        console.error("Error fetching data:", e);
+    }
+}
+
+
 if (!window.civSocInitialized) {
     window.civSocInitialized = true;
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
         const loader = document.getElementById('loader-overlay');
         const hasVisited = sessionStorage.getItem('civsocVisited');
+
+        // Init Firebase if needed (CIVSOC_CONFIG is from firebase-config.js)
+        if(typeof CIVSOC_CONFIG !== 'undefined' && firebase.apps.length === 0) {
+            firebase.initializeApp(CIVSOC_CONFIG.firebaseConfig);
+        }
+
+        await fetchData();
+
         if (loader) {
             if (hasVisited) loader.style.display = 'none';
             else {
@@ -304,7 +354,7 @@ function initReportsAndCommittee() {
 function loadReport(i) {
     document.querySelectorAll('.week-btn').forEach((b,x) => b.classList.toggle('active',x===i));
     const r = reports[i];
-    let fin = r.finances.map(f=>`<tr><td>${f.item}<br><small>${f.category}</small></td><td class="amount ${f.type}">${f.amount}</td></tr>`).join('');
+    let fin = r.finances.map(f=>`<tr><td>${f.item}<br><small>${f.category}</small></td><td class="amount ${f.type}">${f.amt}</td></tr>`).join('');
     document.getElementById('report-content').innerHTML = `<div class="report-header"><h2>Weekly Report</h2><span class="date">${r.label}</span></div><div class="stat-grid"><div class="stat-box"><span class="stat-number">${r.stats.attendance}</span><span class="stat-label">Present</span></div><div class="stat-box"><span class="stat-number">${r.stats.discussion}</span><span class="stat-label">Topics</span></div><div class="stat-box"><span class="stat-number">${r.stats.decisions}</span><span class="stat-label">Decisions</span></div></div>${fin ? `<div class="data-section"><h3>Treasury</h3><table class="transparency-table">${fin}</table></div>` : ''}<div class="data-section"><h3>Minutes</h3><ul>${r.minutes.map(m=>`<li>${m}</li>`).join('')}</ul></div>`;
 }
 function switchView(target) {

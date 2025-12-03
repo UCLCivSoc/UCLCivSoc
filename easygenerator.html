@@ -10,6 +10,8 @@
             --accent: #F6BE00; /* Union Yellow */
             --purple: #500778; /* UCL Purple */
             --blue: #00bcd4;   /* Report Blue */
+            --green: #00e676;  /* Sponsor Green */
+            --red: #ff4444;    /* Eraser Red */
             --text: #ffffff;
         }
 
@@ -44,10 +46,12 @@
         .col-news:hover { box-shadow: inset 0 0 100px rgba(246, 190, 0, 0.1); border-top: 5px solid var(--accent); }
         .col-team:hover { box-shadow: inset 0 0 100px rgba(80, 7, 120, 0.2); border-top: 5px solid var(--purple); }
         .col-fin:hover { box-shadow: inset 0 0 100px rgba(0, 188, 212, 0.15); border-top: 5px solid var(--blue); }
+        .col-spon:hover { box-shadow: inset 0 0 100px rgba(0, 230, 118, 0.15); border-top: 5px solid var(--green); }
+        .col-del:hover { box-shadow: inset 0 0 100px rgba(255, 68, 68, 0.15); border-top: 5px solid var(--red); }
 
         /* --- CONTENT --- */
         .icon-box {
-            font-size: 4rem; margin-bottom: 20px;
+            font-size: 3rem; margin-bottom: 20px;
             filter: grayscale(100%) opacity(0.7);
             transition: all 0.3s;
             transform: scale(1);
@@ -59,14 +63,14 @@
         }
 
         h2 {
-            color: white; text-transform: uppercase; letter-spacing: 2px;
-            margin: 0 0 10px 0; font-size: 1.5rem;
+            color: white; text-transform: uppercase; letter-spacing: 1px;
+            margin: 0 0 10px 0; font-size: 1.2rem;
             text-align: center;
         }
 
         p {
-            color: #888; font-size: 0.9rem; max-width: 250px;
-            text-align: center; line-height: 1.5;
+            color: #888; font-size: 0.8rem; max-width: 200px;
+            text-align: center; line-height: 1.4;
             opacity: 0.7; transition: opacity 0.3s;
         }
         .gen-col:hover p { opacity: 1; color: white; }
@@ -76,7 +80,7 @@
             padding: 10px 20px;
             border: 1px solid rgba(255,255,255,0.3);
             color: white; border-radius: 30px;
-            font-weight: bold; font-size: 0.8rem;
+            font-weight: bold; font-size: 0.7rem;
             text-transform: uppercase;
             opacity: 0; transform: translateY(20px);
             transition: all 0.3s 0.1s;
@@ -101,22 +105,36 @@
 
     <a href="generator-posts.html" class="gen-col col-news">
         <div class="icon-box">📰</div>
-        <h2>News Generator</h2>
-        <p>Create event cards, social posts, and announcements for the main feed.</p>
+        <h2>News</h2>
+        <p>Create event cards and social posts.</p>
         <div class="btn-fake">Launch Tool</div>
     </a>
 
     <a href="generator-committee.html" class="gen-col col-team">
         <div class="icon-box">👥</div>
-        <h2>Team Editor</h2>
-        <p>Add new committee members, update roles, or change headshots.</p>
+        <h2>Team</h2>
+        <p>Update committee profiles.</p>
         <div class="btn-fake">Launch Tool</div>
     </a>
 
     <a href="generator-report.html" class="gen-col col-fin">
         <div class="icon-box">📊</div>
-        <h2>Glass Report™</h2>
-        <p>Generate weekly transparency reports and meeting minutes.</p>
+        <h2>Report</h2>
+        <p>Weekly transparency reports.</p>
+        <div class="btn-fake">Launch Tool</div>
+    </a>
+
+    <a href="generator-sponsors.html" class="gen-col col-spon">
+        <div class="icon-box">🤝</div>
+        <h2>Sponsors</h2>
+        <p>Manage corporate partners.</p>
+        <div class="btn-fake">Launch Tool</div>
+    </a>
+
+    <a href="easyeraser.html" class="gen-col col-del">
+        <div class="icon-box">🗑️</div>
+        <h2>Eraser</h2>
+        <p>Delete content from the database.</p>
         <div class="btn-fake">Launch Tool</div>
     </a>
 

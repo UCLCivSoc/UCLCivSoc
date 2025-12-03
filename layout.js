@@ -3,6 +3,40 @@
  * This file allows us to update the footer (and other common elements) in one place.
  */
 
+async function fetchSponsors() {
+    if(!window.firebase) return;
+    const db = firebase.firestore();
+    const sGrid = document.getElementById('sponsor-grid');
+    const sCol = document.getElementById('sponsor-col');
+    if(!sGrid || !sCol) return;
+
+    try {
+        const snap = await db.collection('sponsors').orderBy('createdAt', 'desc').get();
+        if(!snap.empty) {
+            sGrid.innerHTML = '';
+            snap.forEach(doc => {
+                const s = doc.data();
+                // Create sponsor tile
+                const a = document.createElement('a');
+                a.href = s.url;
+                a.target = '_blank';
+                a.className = 'sponsor-item';
+                // Inline style for simplicity, or add to CSS
+                a.innerHTML = `<img src="${s.logo}" alt="${s.name}" title="${s.name}" style="max-height:60px; max-width:100%; object-fit:contain; filter:brightness(0) invert(1); opacity:0.7; transition:0.3s;">`;
+                
+                // Hover effect logic
+                a.onmouseenter = () => a.firstChild.style.opacity = '1';
+                a.onmouseleave = () => a.firstChild.style.opacity = '0.7';
+
+                sGrid.appendChild(a);
+            });
+            sCol.style.display = 'block';
+        }
+    } catch(e) {
+        console.error("Failed to load sponsors", e);
+    }
+}
+
 function renderFooter(containerId, options = {}) {
     const rootPath = options.rootPath || '';
     const withPillars = options.withPillars || false;
@@ -49,20 +83,10 @@ function renderFooter(containerId, options = {}) {
 
             <div class="footer-col" id="sponsor-col" style="display:none;">
                 <h3>Sponsored By</h3>
-                <div class="sponsor-grid" id="sponsor-grid">
+                <div class="sponsor-grid" id="sponsor-grid" style="display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
                 </div>
             </div>
         </div>
-        <script>
-            // Auto-hide sponsor section if empty
-            setTimeout(() => {
-                const sGrid = document.getElementById('sponsor-grid');
-                const sCol = document.getElementById('sponsor-col');
-                if(sGrid && sCol && sGrid.children.length > 0) {
-                    sCol.style.display = 'block';
-                }
-            }, 0);
-        </script>
 
         <div class="copyright">
             &copy; 2025 UCL Civil Engineering Society. Not officially affiliated with UCL CEGE Dept.
@@ -73,6 +97,8 @@ function renderFooter(containerId, options = {}) {
     const container = document.getElementById(containerId);
     if (container) {
         container.outerHTML = html;
+        // Trigger fetch after render
+        setTimeout(fetchSponsors, 500);
     } else {
         console.error(`Footer container #${containerId} not found.`);
     }
