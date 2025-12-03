@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --bg-dark: #0f0f13; --panel: rgba(30, 30, 35, 0.6); --accent: #00bcd4; --text: #eee; --border: rgba(255,255,255,0.1); }
+        body { background: var(--bg-dark); background-image: radial-gradient(circle at 50% 10%, rgba(0, 188, 212, 0.1) 0%, transparent 50%); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .nav-bar { display: flex; justify-content: center; padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .nav-pills { display: flex; background: rgba(255,255,255,0.05); border-radius: 50px; padding: 5px; gap: 5px; border: 1px solid var(--border); }
+        .tab-btn { background: transparent; border: none; color: #aaa; padding: 10px 25px; font-weight: 700; cursor: pointer; border-radius: 30px; transition: 0.3s; text-transform: uppercase; font-size: 0.8rem; }
+        .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 188, 212, 0.3); }
+
+        .view-section { display: none; padding: 40px 20px; overflow-y: auto; flex-grow: 1; }
+        .view-section.active { display: block; animation: fadeIn 0.3s; }
+        .container { max-width: 800px; margin: 0 auto; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        .glass-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 30px; backdrop-filter: blur(20px); }
+
+        input, textarea, select { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 20px; box-sizing: border-box; font-size: 1rem; }
+        input:focus { border-color: var(--accent); outline: none; background: rgba(0,0,0,0.5); }
+        label { color: var(--accent); font-weight: 800; font-size: 0.75rem; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .list-item { display: grid; grid-template-columns: 2fr 1.5fr 1fr auto auto; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .min-item { display: flex; gap: 10px; margin-bottom: 10px; }
+
+        button { cursor: pointer; border-radius: 6px; border: none; font-weight: bold; transition: 0.2s; }
+        .btn-add { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); color: #aaa; padding: 15px; width: 100%; margin-top: 10px; }
+        .btn-add:hover { background: var(--accent); color: black; border-style: solid; }
+        .btn-del { background: rgba(255,68,68,0.2); color: #ff4444; width: 40px; height: 40px; border: 1px solid rgba(255,68,68,0.3); }
+        .btn-del:hover { background: #ff4444; color: white; }
+
+        #preview-box { background: white; color: black; padding: 40px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        #json-out { background: #08080a; color: #00ff9d; font-family: monospace; height: 300px; padding: 20px; border: 1px solid #333; border-radius: 12px; resize: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <div class="nav-pills">
+            <button class="tab-btn active" onclick="switchTab('stats', this)">1. Stats & Info</button>
+            <button class="tab-btn" onclick="switchTab('details', this)">2. Details</button>
+            <button class="tab-btn" onclick="switchTab('export', this)">3. Export</button>
+        </div>
+    </nav>
+
+    <div id="view-stats" class="view-section active">
+        <div class="container glass-panel">
+            <label>Report Label</label><input type="text" id="label" placeholder="Week 5 (Nov 12-18)" oninput="update()">
+            <label>Unique ID</label><input type="text" id="id" value="week5" oninput="update()">
+            
+            <div class="row">
+                <div><label>Attendance</label><input type="text" id="s-attend" placeholder="12/14" oninput="update()"></div>
+                <div><label>Total Spent</label><input type="text" id="s-spent" placeholder="£50.00" oninput="update()"></div>
+            </div>
+            <div class="row">
+                <div><label>Topics Discussed</label><input type="text" id="s-discuss" placeholder="3" oninput="update()"></div>
+                <div><label>Decisions Made</label><input type="text" id="s-decision" placeholder="2" oninput="update()"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-details" class="view-section">
+        <div class="container glass-panel">
+            <label>Finances</label>
+            <div id="finance-list"></div>
+            <button class="btn-add" onclick="addFin()">+ Add Transaction</button>
+            
+            <hr style="border:0; border-top:1px solid #333; margin: 30px 0;">
+
+            <label>Minutes</label>
+            <div id="minute-list"></div>
+            <button class="btn-add" onclick="addMin()">+ Add Minute Bullet</button>
+        </div>
+    </div>
+
+    <div id="view-export" class="view-section">
+        <div class="container">
+            <div id="preview-box" class="report-content" style="box-shadow:none;"></div>
+            <textarea id="json-out" readonly></textarea>
+            <button onclick="copy()" style="width:100%; padding:18px; background:var(--accent); color:black; font-weight:900; margin-top:10px; font-size:1rem; text-transform:uppercase;">COPY JSON</button>
+        </div>
+    </div>
+
+    <script>
+        let fins = [];
+        let mins = [""];
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            btn.classList.add('active');
+            update();
+        }
+
+        function addFin() { fins.push({item:"", cat:"", amt:"", type:"negative"}); renderLists(); }
+        function addMin() { mins.push(""); renderLists(); }
+        
+        function renderLists() {
+            const fDiv = document.getElementById('finance-list');
+            fDiv.innerHTML = '';
+            fins.forEach((f, i) => {
+                fDiv.innerHTML += `
+                <div class="list-item">
+                    <input style="margin:0" placeholder="Item" value="${f.item}" oninput="fins[${i}].item=this.value;update()">
+                    <input style="margin:0" placeholder="Category" value="${f.cat}" oninput="fins[${i}].cat=this.value;update()">
+                    <input style="margin:0" placeholder="£0.00" value="${f.amt}" oninput="fins[${i}].amt=this.value;update()">
+                    <select style="margin:0; width:auto;" onchange="fins[${i}].type=this.value;update()">
+                        <option value="negative" ${f.type=='negative'?'selected':''}>Cost</option>
+                        <option value="positive" ${f.type=='positive'?'selected':''}>Income</option>
+                    </select>
+                    <button class="btn-del" onclick="fins.splice(${i},1);renderLists();update()">X</button>
+                </div>`;
+            });
+
+            const mDiv = document.getElementById('minute-list');
+            mDiv.innerHTML = '';
+            mins.forEach((m, i) => {
+                mDiv.innerHTML += `
+                <div class="min-item">
+                    <input style="margin:0" value="${m}" oninput="mins[${i}]=this.value;update()">
+                    <button class="btn-del" onclick="mins.splice(${i},1);renderLists();update()">X</button>
+                </div>`;
+            });
+        }
+
+        function update() {
+            const s = {
+                id: document.getElementById('id').value,
+                label: document.getElementById('label').value,
+                att: document.getElementById('s-attend').value,
+                spd: document.getElementById('s-spent').value,
+                dis: document.getElementById('s-discuss').value,
+                dec: document.getElementById('s-decision').value
+            };
+
+            // Preview HTML
+            let finH = fins.length ? `<div class="data-section"><h3>Treasury</h3><table class="transparency-table">` + 
+                fins.map(f => `<tr><td>${f.item}<br><small>${f.cat}</small></td><td class="amount ${f.type}">${f.amt}</td></tr>`).join('') + `</table></div>` : '';
+            
+            let minH = `<div class="data-section"><h3>Minutes</h3><ul>` + mins.map(m=>`<li>${m}</li>`).join('') + `</ul></div>`;
+
+            document.getElementById('preview-box').innerHTML = `
+                <div class="report-header"><h2>Weekly Report</h2><span class="date">${s.label}</span></div>
+                <div class="stat-grid">
+                    <div class="stat-box"><span class="stat-number">${s.att}</span><span class="stat-label">Present</span></div>
+                    <div class="stat-box"><span class="stat-number">${s.dis}</span><span class="stat-label">Topics</span></div>
+                    <div class="stat-box"><span class="stat-number">${s.dec}</span><span class="stat-label">Decisions</span></div>
+                    <div class="stat-box"><span class="stat-number">${s.spd}</span><span class="stat-label">Spent</span></div>
+                </div>
+                ${finH} ${minH}`;
+
+            // JSON
+            let json = `{\n  id: '${s.id}',\n  label: '${s.label}',\n  stats: { attendance: '${s.att}', spent: '${s.spd}', discussion: '${s.dis}', decisions: '${s.dec}' },\n`;
+            json += `  finances: [\n` + fins.map(f => `    { item: "${f.item}", category: "${f.cat}", amount: "${f.amt}", type: "${f.type}" }`).join(',\n') + `\n  ],\n`;
+            json += `  minutes: [\n` + mins.map(m => `    "${m}"`).join(',\n') + `\n  ]\n},`;
+            
+            document.getElementById('json-out').value = json;
+        }
+        function copy() { navigator.clipboard.writeText(document.getElementById('json-out').value); alert("Copied!"); }
+        
+        renderLists(); update();
+    </script>
+</body>
+</html>

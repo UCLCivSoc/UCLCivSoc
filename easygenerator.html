@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivSoc Generators</title>
+    <style>
+        :root {
+            --bg-dark: #0f0f13;
+            --accent: #F6BE00; /* Union Yellow */
+            --purple: #500778; /* UCL Purple */
+            --blue: #00bcd4;   /* Report Blue */
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-dark);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            height: 100vh; width: 100vw;
+            overflow: hidden;
+            display: flex; /* Creates the column layout */
+        }
+
+        /* --- THE COLUMNS --- */
+        .gen-col {
+            flex: 1; /* Takes up equal space */
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-decoration: none;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.02), transparent);
+        }
+
+        .gen-col:last-child { border-right: none; }
+
+        /* HOVER EFFECTS */
+        .gen-col:hover { flex: 1.5; /* Expands on hover */ background: rgba(255,255,255,0.05); }
+        
+        /* Color Overlays on Hover */
+        .col-news:hover { box-shadow: inset 0 0 100px rgba(246, 190, 0, 0.1); border-top: 5px solid var(--accent); }
+        .col-team:hover { box-shadow: inset 0 0 100px rgba(80, 7, 120, 0.2); border-top: 5px solid var(--purple); }
+        .col-fin:hover { box-shadow: inset 0 0 100px rgba(0, 188, 212, 0.15); border-top: 5px solid var(--blue); }
+
+        /* --- CONTENT --- */
+        .icon-box {
+            font-size: 4rem; margin-bottom: 20px;
+            filter: grayscale(100%) opacity(0.7);
+            transition: all 0.3s;
+            transform: scale(1);
+        }
+        
+        .gen-col:hover .icon-box { 
+            filter: grayscale(0%) opacity(1); 
+            transform: scale(1.2) translateY(-10px); 
+        }
+
+        h2 {
+            color: white; text-transform: uppercase; letter-spacing: 2px;
+            margin: 0 0 10px 0; font-size: 1.5rem;
+            text-align: center;
+        }
+
+        p {
+            color: #888; font-size: 0.9rem; max-width: 250px;
+            text-align: center; line-height: 1.5;
+            opacity: 0.7; transition: opacity 0.3s;
+        }
+        .gen-col:hover p { opacity: 1; color: white; }
+
+        .btn-fake {
+            margin-top: 30px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white; border-radius: 30px;
+            font-weight: bold; font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0; transform: translateY(20px);
+            transition: all 0.3s 0.1s;
+        }
+        .gen-col:hover .btn-fake { opacity: 1; transform: translateY(0); }
+
+        /* --- BACK BUTTON --- */
+        .back-btn {
+            position: absolute; top: 30px; left: 30px;
+            color: #666; text-decoration: none;
+            font-weight: bold; font-size: 0.9rem;
+            z-index: 100; display: flex; align-items: center; gap: 10px;
+            transition: color 0.2s;
+        }
+        .back-btn:hover { color: white; }
+
+    </style>
+</head>
+<body>
+
+    <a href="admin.html" class="back-btn">← RETURN TO ADMIN</a>
+
+    <a href="generator-posts.html" class="gen-col col-news">
+        <div class="icon-box">📰</div>
+        <h2>News Generator</h2>
+        <p>Create event cards, social posts, and announcements for the main feed.</p>
+        <div class="btn-fake">Launch Tool</div>
+    </a>
+
+    <a href="generator-committee.html" class="gen-col col-team">
+        <div class="icon-box">👥</div>
+        <h2>Team Editor</h2>
+        <p>Add new committee members, update roles, or change headshots.</p>
+        <div class="btn-fake">Launch Tool</div>
+    </a>
+
+    <a href="generator-report.html" class="gen-col col-fin">
+        <div class="icon-box">📊</div>
+        <h2>Glass Report™</h2>
+        <p>Generate weekly transparency reports and meeting minutes.</p>
+        <div class="btn-fake">Launch Tool</div>
+    </a>
+
+</body>
+</html>
