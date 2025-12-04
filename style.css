@@ -35,17 +35,29 @@
 
 /* --- DARK MODE OVERRIDES --- */
 body.dark-mode {
-    --bg-color: #121212;
-    --text-main: #e0e0e0;
-    --card-bg: #1e1e1e;
-    --panel-bg: #252525;
-    --panel-bg-alt: #2a2a2a;
-    --border-color: #333;
-    --text-secondary: #b0b0b0;
-    --text-tertiary: #888;
-    --heading-color: #ffffff;
-    --modal-bg: #1e1e1e;
-    --ticket-bg: #0a0a0a;
+    --bg-color: #050505;
+    --text-main: #c0c0c0;
+    --card-bg: #111111;
+    --panel-bg: #141414;
+    --panel-bg-alt: #1a1a1a;
+    --border-color: #2a2a2a;
+    --text-secondary: #888;
+    --text-tertiary: #555;
+    --heading-color: #d0d0d0;
+    --modal-bg: #111111;
+    --ticket-bg: #000000;
+    
+    /* Darker / Muted Accents */
+    --ucl-purple: #1a0226; /* Very dark purple */
+    --col-social: #701036; /* Dark muted pink */
+    --col-career: #002a52; /* Dark muted blue */
+    --col-academic: #2a0440; /* Dark purple/black */
+    --col-admin: #750e0e; /* Dark red */
+    --col-major-gold: #8f6a00; /* Dark gold */
+    --col-highlight: #2c5d75; /* Dark cyan */
+    
+    --su-yellow: #a88200; /* Darker mustard gold */
+    --su-black: #ffffff; /* Invert black to white for contrast on buttons */
 }
 
 /* Specific Dark Mode Tweaks */
