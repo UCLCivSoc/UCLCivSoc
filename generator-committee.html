@@ -3,143 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <title>Committee Generator</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        :root { --bg-dark: #0f0f13; --panel: rgba(30, 30, 35, 0.6); --accent: #F6BE00; --text: #eee; --border: rgba(255,255,255,0.1); }
-        body { background: var(--bg-dark); background-image: radial-gradient(circle at 90% 10%, rgba(80, 7, 120, 0.15) 0%, transparent 40%); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .nav-bar { display: flex; justify-content: center; padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); position: relative; }
-        .nav-pills { display: flex; background: rgba(255,255,255,0.05); border-radius: 50px; padding: 5px; gap: 5px; border: 1px solid var(--border); }
-        .tab-btn { background: transparent; border: none; color: #aaa; padding: 10px 25px; font-weight: 700; cursor: pointer; border-radius: 30px; transition: 0.3s; text-transform: uppercase; font-size: 0.8rem; }
-        .tab-btn.active { background: var(--accent); color: #000; }
-        .logout-btn { position: absolute; right: 20px; top: 20px; background: transparent; border: 1px solid #444; color: #888; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        :root { 
+            --bg: #121214;
+            --surface: #1e1e24;
+            --surface-hover: #272730;
+            --border: #333;
+            --primary: #F6BE00;
+            --text: #e1e1e6; 
+            --text-muted: #a8a8b3;
+            --accent-purple: #8257e5;
+            --radius: 8px;
+            --font-sans: 'Inter', -apple-system, sans-serif;
+        }
 
-        .view-section { display: none; padding: 40px 20px; overflow-y: auto; flex-grow: 1; }
-        .view-section.active { display: block; animation: fadeIn 0.3s; }
-        .container { max-width: 600px; margin: 0 auto; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        * { box-sizing: border-box; outline: none; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font-sans); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .glass-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 30px; backdrop-filter: blur(20px); }
+        .top-bar { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--surface); }
+        .nav-left a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .nav-left a:hover { color: var(--text); }
 
-        input, textarea { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 20px; box-sizing: border-box; font-size: 1rem; }
-        input:focus, textarea:focus { border-color: var(--accent); outline: none; background: rgba(0,0,0,0.5); }
-        label { color: var(--accent); font-weight: 800; font-size: 0.75rem; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        .workspace { display: flex; flex: 1; height: calc(100vh - 60px); }
+        .sidebar { width: 350px; background: var(--surface); border-right: 1px solid var(--border); padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .preview-area { flex: 1; background: #f0f2f5; padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; }
 
-        #json-out { background: #08080a; color: #00ff9d; font-family: monospace; width: 100%; height: 250px; border: 1px solid #333; padding: 20px; border-radius: 12px; margin-top: 20px; resize: none; }
-        
-        /* PREVIEW */
-        #preview-box { background: #f0f0f0; padding: 60px; border-radius: 12px; display: flex; justify-content: center; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
-        .member-card { width: 300px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #500778; }
-        .member-img-box { width: 100%; height: 300px; background: #ddd; }
+        label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: 0.5px; }
+        input, textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: var(--radius); width: 100%; font-family: inherit; font-size: 0.9rem; transition: 0.2s; }
+        input:focus, textarea:focus { border-color: var(--primary); }
+
+        .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: #000; font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.9rem; text-transform: uppercase; margin-top: auto; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-upload { background: var(--surface-hover); color: var(--text); border: 1px solid var(--border); padding: 8px 15px; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem; margin-top: 5px; width: 100%; }
+        .btn-upload:hover { border-color: var(--text-muted); }
+
+        /* PREVIEW CARD STYLE */
+        .member-card { width: 300px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-top: 5px solid #500778; transition: transform 0.3s; }
+        .member-img-box { width: 100%; height: 300px; background: #ddd; overflow: hidden; }
         .member-img { width: 100%; height: 100%; object-fit: cover; }
-        .member-info { padding: 20px; text-align: center; }
-        .member-role { font-size: 0.8rem; font-weight: 700; color: #500778; text-transform: uppercase; margin-bottom: 5px; }
-        .member-name { font-size: 1.5rem; font-weight: 800; color: #111; margin-bottom: 10px; }
-        .member-bio { font-size: 0.95rem; color: #666; margin-bottom: 15px; }
-        .member-email { display: inline-block; padding: 5px 12px; border: 1px solid #ddd; border-radius: 20px; text-decoration: none; color: #333; font-size: 0.85rem; }
-        
-        .upload-btn { background: #333; color: white; border: 1px solid #555; padding: 10px; border-radius: 4px; margin-bottom: 20px; cursor: pointer; width: 100%; }
-        .upload-btn:hover { background: #444; }
+        .member-info { padding: 25px; text-align: center; }
+        .member-role { font-size: 0.75rem; font-weight: 800; color: #500778; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .member-name { font-size: 1.4rem; font-weight: 800; color: #111; margin-bottom: 12px; line-height: 1.2; }
+        .member-bio { font-size: 0.9rem; color: #666; margin-bottom: 20px; line-height: 1.5; }
+        .member-email { display: inline-block; padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; text-decoration: none; color: #333; font-size: 0.8rem; font-weight: 600; }
+
+        #json-out { width: 100%; height: 100px; background: #000; color: #0f0; border: none; padding: 10px; margin-top: 20px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; resize: none; opacity: 0.5; }
+        #status-msg { margin-top: 10px; font-size: 0.85rem; text-align: center; font-weight: bold; min-height: 1.2em; }
     </style>
 
-    <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
 </head>
 <body>
-    <nav class="nav-bar">
-        <a href="easygenerator.html" style="position: absolute; left: 20px; top: 20px; color: #888; text-decoration: none;">← Return to Hub</a>
-        <div class="nav-pills">
-            <button class="tab-btn active" onclick="switchTab('form', this)">1. Member Details</button>
-            <button class="tab-btn" onclick="switchTab('preview', this)">2. Preview & Save</button>
-        </div>
-        <button onclick="logout()" class="logout-btn">Logout</button>
-    </nav>
-
-    <div id="view-form" class="view-section active">
-        <div class="container glass-panel">
-            <label>Full Name</label><input type="text" id="name" placeholder="Name" oninput="update()">
-            <label>Role</label><input type="text" id="role" placeholder="Role" oninput="update()">
-            <label>LinkedIn (Optional)</label><input type="text" id="linkedin" placeholder="https://linkedin.com..." oninput="update()">
-            
-            <label>Image Path</label>
-            <input type="text" id="image" value="images/committee/placeholder.jpg" oninput="update()">
-            <button class="upload-btn" onclick="document.getElementById('file-in').click()">Upload Photo</button>
-            <input type="file" id="file-in" style="display:none" accept="image/*" onchange="uploadPhoto(this)">
-
-            <label>Bio</label><textarea id="bio" rows="4" placeholder="Short bio..." oninput="update()"></textarea>
-        </div>
+    <div class="top-bar">
+        <div class="nav-left"><a href="easygenerator.html">← Generator Hub</a></div>
+        <div style="font-weight:700; letter-spacing:1px; color:#fff;">COMMITTEE EDITOR</div>
+        <button onclick="logout()" style="background:transparent;border:1px solid #444;color:#888;padding:5px 10px;border-radius:4px;cursor:pointer;">Logout</button>
     </div>
 
-    <div id="view-preview" class="view-section">
-        <div class="container">
+    <div class="workspace">
+        <div class="sidebar">
+            <div>
+                <label>Full Name</label>
+                <input type="text" id="name" placeholder="e.g. John Doe" oninput="update()">
+            </div>
+            <div>
+                <label>Role / Position</label>
+                <input type="text" id="role" placeholder="e.g. President" oninput="update()">
+            </div>
+            <div>
+                <label>LinkedIn URL (Optional)</label>
+                <input type="text" id="linkedin" placeholder="https://linkedin.com/in/..." oninput="update()">
+            </div>
+            <div>
+                <label>Profile Image</label>
+                <input type="text" id="image" value="images/committee/placeholder.jpg" oninput="update()" style="margin-bottom:5px;">
+                <button class="btn-upload" onclick="document.getElementById('file-in').click()">Upload Photo</button>
+                <input type="file" id="file-in" style="display:none" accept="image/*" onchange="uploadPhoto(this)">
+            </div>
+            <div>
+                <label>Bio (Short)</label>
+                <textarea id="bio" rows="4" placeholder="Brief description..." oninput="update()"></textarea>
+            </div>
+
+            <div style="flex:1;"></div>
+            <div id="status-msg"></div>
+            <button class="btn-primary" id="save-btn" onclick="saveCommittee()">Save to Database</button>
+        </div>
+
+        <div class="preview-area">
+            <div style="color:#888; font-weight:bold; margin-bottom:20px; text-transform:uppercase; font-size:0.8rem;">Live Preview</div>
             <div id="preview-box"></div>
             <textarea id="json-out" readonly></textarea>
-            <button id="save-btn" onclick="saveCommittee()" style="width:100%; padding:18px; background:var(--accent); font-weight:900; border:none; border-radius:8px; cursor:pointer; margin-top:10px; font-size:1rem; text-transform:uppercase;">SAVE TO DATABASE</button>
-            <div id="status-msg" style="text-align:center; margin-top:10px;"></div>
         </div>
     </div>
 
     <script>
         let db;
-        checkAuth((user) => {
-            db = firebase.firestore();
-        });
-
-        function switchTab(id, btn) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
-            btn.classList.add('active');
-            update();
-        }
+        checkAuth((user) => { db = firebase.firestore(); });
 
         async function uploadPhoto(input) {
             if(!input.files || !input.files[0]) return;
-            const btn = document.querySelector('.upload-btn');
+            const btn = document.querySelector('.btn-upload');
             const original = btn.innerText;
-            btn.innerText = "Uploading...";
-            btn.disabled = true;
+            btn.innerText = "Uploading..."; btn.disabled = true;
 
             try {
                 const formData = new FormData();
                 formData.append('file', input.files[0]);
                 formData.append('upload_preset', CIVSOC_CONFIG.cloudinary.uploadPreset);
-
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CIVSOC_CONFIG.cloudinary.cloudName}/image/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CIVSOC_CONFIG.cloudinary.cloudName}/image/upload`, { method: 'POST', body: formData });
                 const data = await res.json();
-                if(data.secure_url) {
-                    document.getElementById('image').value = data.secure_url;
-                    update();
-                }
-            } catch(e) {
-                console.error(e);
-                alert("Upload failed");
-            } finally {
-                btn.innerText = original;
-                btn.disabled = false;
-            }
+                if(data.secure_url) { document.getElementById('image').value = data.secure_url; update(); }
+            } catch(e) { console.error(e); alert("Upload failed"); } 
+            finally { btn.innerText = original; btn.disabled = false; }
         }
 
         function update() {
             const d = {
-                name: document.getElementById('name').value || "Name",
-                role: document.getElementById('role').value || "Role",
+                name: document.getElementById('name').value || "Name Surname",
+                role: document.getElementById('role').value || "Committee Role",
                 linkedin: document.getElementById('linkedin').value,
                 image: document.getElementById('image').value,
-                bio: document.getElementById('bio').value || "Bio goes here."
+                bio: document.getElementById('bio').value || "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             };
 
-            const linkBtn = d.linkedin 
-                ? `<a href="#" class="member-email" style="color:#0077b5;border-color:#0077b5">Linked<strong>in</strong></a>` 
-                : ``;
+            const linkBtn = d.linkedin ? `<a href="#" class="member-email" style="color:#0077b5;border-color:#0077b5">Linked<strong>in</strong></a>` : ``;
 
             document.getElementById('preview-box').innerHTML = `
                 <div class="member-card">
@@ -152,42 +144,27 @@
                     </div>
                 </div>`;
 
-            let obj = {
-                name: d.name,
-                role: d.role,
-                image: d.image,
-                bio: d.bio,
-                createdAt: new Date().toISOString()
-            };
+            let obj = { name: d.name, role: d.role, image: d.image, bio: d.bio, createdAt: new Date().toISOString() };
             if(d.linkedin) obj.linkedin = d.linkedin;
-            
             document.getElementById('json-out').value = JSON.stringify(obj, null, 2);
         }
 
         async function saveCommittee() {
             const json = document.getElementById('json-out').value;
             if(!json) return;
-            
             const btn = document.getElementById('save-btn');
             const status = document.getElementById('status-msg');
-            btn.disabled = true;
-            btn.innerText = "SAVING...";
+            btn.disabled = true; btn.innerText = "SAVING..."; status.innerText = "";
 
             try {
                 const data = JSON.parse(json);
                 await db.collection("committee").add(data);
-                status.innerText = "Saved successfully!";
-                status.style.color = "#00e676";
-                btn.innerText = "SAVED";
+                status.innerText = "Saved successfully!"; status.style.color = "#00e676"; btn.innerText = "SAVED";
+                setTimeout(() => { btn.innerText = "Save to Database"; btn.disabled = false; status.innerText = ""; }, 3000);
             } catch(e) {
-                console.error(e);
-                status.innerText = "Error: " + e.message;
-                status.style.color = "red";
-                btn.innerText = "TRY AGAIN";
-                btn.disabled = false;
+                console.error(e); status.innerText = "Error: " + e.message; status.style.color = "#ff4444"; btn.innerText = "TRY AGAIN"; btn.disabled = false;
             }
         }
-        
         update();
     </script>
 </body>

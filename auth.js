@@ -1,6 +1,13 @@
 // Authentication Utility using Firebase Google Sign-In
 // Requires: firebase-app, firebase-auth scripts to be loaded first
 
+// Hardcoded list of allowed admin emails, matching Firestore security rules
+const ALLOWED_ADMINS = [
+    "uclcivilengineeringsociety@gmail.com",
+    "alexandrefedala87@gmail.com",
+    "accardomichele06@gmail.com"
+];
+
 function checkAuth(callback) {
     if (!firebase.apps.length) {
         if (typeof CIVSOC_CONFIG !== 'undefined') {
@@ -13,8 +20,15 @@ function checkAuth(callback) {
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            console.log("User logged in:", user.email);
-            if (callback) callback(user);
+            // Check if email is in the allowed list
+            if (ALLOWED_ADMINS.includes(user.email)) {
+                console.log("User authorized:", user.email);
+                if (callback) callback(user);
+            } else {
+                console.warn("User unauthorized:", user.email);
+                // Redirect to error page
+                window.location.href = 'error.html';
+            }
         } else {
             console.log("User not logged in. Redirecting to login...");
             redirectToLogin();
@@ -64,7 +78,7 @@ function redirectToLogin() {
             .then((result) => {
                 // Auth successful
                 overlay.remove();
-                // Optional: reload or just let the callback fire (onAuthStateChanged will fire)
+                // The onAuthStateChanged listener will handle the rest (check email and redirect if needed)
             })
             .catch((error) => {
                 const errEl = document.getElementById('auth-error');

@@ -378,7 +378,31 @@ function openArticle(index) {
         const l = getCalendarLinks(post);
         return `<div class="cal-wrapper"><div class="cal-btn" onclick="toggleCalendar(this)">📅</div><div class="cal-menu"><a href="${l.outlookUCL}" target="_blank" class="cal-option">Outlook (UCL)</a><a href="${l.google}" target="_blank" class="cal-option">Google</a><a href="${l.ics}" download="${post.title}.ics" class="cal-option">File (.ics)</a></div></div>`;
     })() : '';
-    let bookBtn = post.hasTickets ? (post.ticketStatus==='Sold Out' ? `<div class="su-booking-btn sold-out">❌ Sold Out</div>` : `<a href="https://studentsunionucl.org" target="_blank" class="su-booking-btn"><img src="images/website/sulogo.png"> Book Ticket</a>`) : '';
+    let bookBtn = '';
+    if (post.hasTickets || (post.linkType && post.linkType !== 'none')) {
+        const isSoldOut = post.ticketStatus === 'Sold Out';
+        
+        // Default Logic (Legacy support)
+        let href = "https://studentsunionucl.org";
+        let label = "Book Ticket";
+        let icon = "images/website/sulogo.png";
+        let btnClass = "su-booking-btn";
+        
+        // New Logic
+        if (post.ticketLink) href = post.ticketLink;
+
+        if (post.linkType === 'ms') {
+            label = "Register Interest"; // Or 'Open Form'
+            icon = "images/website/ms_forms.png";
+            btnClass = "su-booking-btn ms-btn"; // We'll add .ms-btn style
+        }
+        
+        if (isSoldOut) {
+            bookBtn = `<div class="${btnClass} sold-out">❌ Sold Out</div>`;
+        } else {
+            bookBtn = `<a href="${href}" target="_blank" class="${btnClass}"><img src="${icon}"> ${label}</a>`;
+        }
+    }
 
     articleModal.innerHTML = `
         <div class="article-layout">
