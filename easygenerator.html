@@ -7,12 +7,14 @@
     <style>
         :root {
             --bg-dark: #0f0f13;
-            --accent: #F6BE00; /* Union Yellow */
-            --purple: #500778; /* UCL Purple */
-            --blue: #00bcd4;   /* Report Blue */
-            --green: #00e676;  /* Sponsor Green */
-            --red: #ff4444;    /* Eraser Red */
+            --accent: #F6BE00; 
+            --purple: #500778; 
+            --blue: #00bcd4;   
+            --green: #00e676;  
+            --red: #ff4444;    
             --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -21,175 +23,240 @@
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             height: 100vh; width: 100vw;
             overflow: hidden;
-            display: flex; /* Creates the column layout */
+            display: flex;
         }
 
         /* --- THE COLUMNS --- */
         .gen-col {
-            flex: 1; /* Takes up equal space */
+            flex: 1;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             text-decoration: none;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid var(--border);
             position: relative;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             cursor: pointer;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.02), transparent);
+            background: linear-gradient(to bottom, var(--glass), transparent);
+            overflow: hidden;
         }
-
         .gen-col:last-child { border-right: none; }
 
         /* HOVER EFFECTS */
-        .gen-col:hover { flex: 1.5; /* Expands on hover */ background: rgba(255,255,255,0.05); }
+        .gen-col:hover { flex: 2; background: rgba(255,255,255,0.06); }
         
-        /* Color Overlays on Hover */
-        .col-news:hover { box-shadow: inset 0 0 100px rgba(246, 190, 0, 0.1); border-top: 5px solid var(--accent); }
-        .col-team:hover { box-shadow: inset 0 0 100px rgba(80, 7, 120, 0.2); border-top: 5px solid var(--purple); }
-        .col-fin:hover { box-shadow: inset 0 0 100px rgba(0, 188, 212, 0.15); border-top: 5px solid var(--blue); }
-        .col-spon:hover { box-shadow: inset 0 0 100px rgba(0, 230, 118, 0.15); border-top: 5px solid var(--green); }
-        .col-del:hover { box-shadow: inset 0 0 100px rgba(255, 68, 68, 0.15); border-top: 5px solid var(--red); }
+        .gen-col::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--col-color); transform: scaleX(0); transition: transform 0.4s;
+        }
+        .gen-col:hover::before { transform: scaleX(1); }
+
+        .col-news { --col-color: var(--accent); }
+        .col-team { --col-color: var(--purple); }
+        .col-fin { --col-color: var(--blue); }
+        .col-spon { --col-color: var(--green); }
+        .col-del { --col-color: var(--red); }
 
         /* --- CONTENT --- */
+        .content-wrapper {
+            z-index: 2; display: flex; flex-direction: column; align-items: center;
+            transform: translateY(20px); transition: transform 0.4s;
+        }
+        .gen-col:hover .content-wrapper { transform: translateY(0); }
+
         .icon-box {
             font-size: 3rem; margin-bottom: 20px;
-            filter: grayscale(100%) opacity(0.7);
-            transition: all 0.3s;
-            transform: scale(1);
+            filter: grayscale(100%) opacity(0.5);
+            transition: all 0.4s; transform: scale(1);
         }
-        
         .gen-col:hover .icon-box { 
             filter: grayscale(0%) opacity(1); 
-            transform: scale(1.2) translateY(-10px); 
+            transform: scale(1.3) translateY(-10px); 
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         h2 {
-            color: white; text-transform: uppercase; letter-spacing: 1px;
-            margin: 0 0 10px 0; font-size: 1.2rem;
-            text-align: center;
+            color: white; text-transform: uppercase; letter-spacing: 2px;
+            margin: 0 0 10px 0; font-size: 1.1rem; font-weight: 800;
+            text-align: center; opacity: 0.8; transition: 0.3s;
         }
+        .gen-col:hover h2 { opacity: 1; letter-spacing: 3px; color: var(--col-color); }
 
         p {
             color: #888; font-size: 0.8rem; max-width: 200px;
-            text-align: center; line-height: 1.4;
-            opacity: 0.7; transition: opacity 0.3s;
+            text-align: center; line-height: 1.5;
+            opacity: 0; transform: translateY(10px); transition: all 0.3s 0.1s;
         }
-        .gen-col:hover p { opacity: 1; color: white; }
+        .gen-col:hover p { opacity: 1; transform: translateY(0); }
 
         .btn-fake {
-            margin-top: 30px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255,255,255,0.3);
+            margin-top: 30px; padding: 10px 24px;
+            border: 1px solid rgba(255,255,255,0.2);
             color: white; border-radius: 30px;
-            font-weight: bold; font-size: 0.7rem;
-            text-transform: uppercase;
-            opacity: 0; transform: translateY(20px);
-            transition: all 0.3s 0.1s;
+            font-weight: bold; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+            opacity: 0; transform: translateY(20px); transition: all 0.3s 0.2s;
         }
-        .gen-col:hover .btn-fake { opacity: 1; transform: translateY(0); }
+        .gen-col:hover .btn-fake { 
+            opacity: 1; transform: translateY(0); 
+            background: var(--col-color); border-color: var(--col-color); color: black;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
 
         /* --- BACK BUTTON --- */
         .back-btn {
             position: absolute; top: 30px; left: 30px;
             color: #666; text-decoration: none;
-            font-weight: bold; font-size: 0.9rem;
+            font-weight: bold; font-size: 0.8rem; letter-spacing: 1px;
             z-index: 100; display: flex; align-items: center; gap: 10px;
-            transition: color 0.2s;
+            transition: color 0.2s; padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; background: rgba(0,0,0,0.5);
         }
-        .back-btn:hover { color: white; }
+        .back-btn:hover { color: white; border-color: white; background: black; }
 
-        /* --- INTRO ANIMATION --- */
+        /* --- ENHANCED INTRO ANIMATION --- */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--bg-dark); z-index: 9999;
+            background: black; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             overflow: hidden; pointer-events: none;
         }
         
+        /* Grid background for tech feel */
+        .intro-grid {
+            position: absolute; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: grid-move 5s linear infinite;
+            opacity: 0;
+        }
+
         .intro-bolt {
-            font-size: 5rem; color: var(--accent);
-            animation: bolt-sequence 3s cubic-bezier(0.7, 0, 0.3, 1) forwards;
-            position: absolute; z-index: 2;
+            font-size: 0rem; color: var(--accent);
+            position: relative; z-index: 2;
+            text-shadow: 0 0 20px rgba(246, 190, 0, 0.8);
+            animation: bolt-entrance 3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
-
+        
+        .intro-text-box {
+            position: absolute; top: 60%; 
+            display: flex; flex-direction: column; align-items: center;
+            gap: 10px;
+        }
+        
         .intro-text {
-            color: white; font-weight: 900; font-size: 2rem; 
-            text-transform: uppercase; letter-spacing: 5px;
-            margin-top: 120px; /* Offset from center where bolt is */
-            animation: text-pulse-fade 2s ease-in-out forwards;
-            z-index: 1;
+            color: white; font-weight: 900; font-size: 3rem; 
+            text-transform: uppercase; letter-spacing: 10px;
+            opacity: 0; transform: translateY(20px);
+            animation: text-reveal 1s 1s ease-out forwards;
+        }
+        
+        .intro-sub {
+            color: var(--accent); font-family: 'Courier New', monospace; font-size: 0.9rem;
+            opacity: 0; animation: text-reveal 1s 1.5s ease-out forwards;
         }
 
-        @keyframes text-pulse-fade {
-            0%, 60% { opacity: 1; transform: scale(1); text-shadow: 0 0 20px rgba(246, 190, 0, 0.5); }
-            50% { transform: scale(1.05); text-shadow: 0 0 40px rgba(246, 190, 0, 0.8); }
-            100% { opacity: 0; transform: scale(0.9); }
+        .loading-bar {
+            width: 200px; height: 2px; background: #333; margin-top: 20px;
+            position: relative; overflow: hidden; opacity: 0;
+            animation: fade-in 0.5s 1.8s forwards;
+        }
+        .loading-fill {
+            position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+            background: var(--accent);
+            animation: load-progress 1.5s 1.8s ease-in-out forwards;
         }
 
-        @keyframes bolt-sequence {
-            0%, 50% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(246, 190, 0, 0.6)); }
-            60% { transform: scale(1); }
-            100% { transform: scale(100); filter: drop-shadow(0 0 0 rgba(246, 190, 0, 0)); opacity: 0; }
+        @keyframes grid-move { 0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } 100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
+        
+        @keyframes bolt-entrance {
+            0% { font-size: 0rem; opacity: 0; transform: rotate(-20deg); }
+            40% { font-size: 8rem; opacity: 1; transform: rotate(0deg); }
+            60% { font-size: 8rem; transform: scale(1.1); text-shadow: 0 0 50px rgba(246, 190, 0, 1); }
+            100% { font-size: 8rem; transform: scale(1); }
         }
 
-        @keyframes overlay-fade {
-            0%, 80% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
+        @keyframes text-reveal { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-in { to { opacity: 1; } }
+        @keyframes load-progress { 0% { width: 0%; } 100% { width: 100%; } }
+
+        @keyframes curtain-up {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
         }
 
-        #intro-overlay.finished { display: none; }
+        /* Final removal */
+        .intro-finished { animation: curtain-up 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
 
     </style>
 </head>
 <body>
 
     <div id="intro-overlay">
+        <div class="intro-grid"></div>
         <div class="intro-bolt">⚡</div>
-        <div class="intro-text">Easy Generator</div>
+        <div class="intro-text-box">
+            <div class="intro-text">Generator</div>
+            <div class="intro-sub">INITIALIZING SYSTEMS...</div>
+            <div class="loading-bar"><div class="loading-fill"></div></div>
+        </div>
     </div>
+
     <script>
+        // Trigger grid fade in
+        setTimeout(() => document.querySelector('.intro-grid').style.opacity = '0.3', 500);
+        
+        // Remove overlay
         setTimeout(() => {
-            document.getElementById('intro-overlay').style.animation = "overlay-fade 0.5s ease-out forwards";
-            setTimeout(() => {
-                document.getElementById('intro-overlay').classList.add('finished');
-            }, 500);
-        }, 2800);
+            document.getElementById('intro-overlay').classList.add('intro-finished');
+        }, 3500);
     </script>
 
     <a href="admin.html" class="back-btn">← RETURN TO ADMIN</a>
 
     <a href="generator-posts.html" class="gen-col col-news">
-        <div class="icon-box">📰</div>
-        <h2>News</h2>
-        <p>Create event cards and social posts.</p>
-        <div class="btn-fake">Launch Tool</div>
+        <div class="content-wrapper">
+            <div class="icon-box">📰</div>
+            <h2>News</h2>
+            <p>Create event cards and social posts.</p>
+            <div class="btn-fake">Launch</div>
+        </div>
     </a>
 
     <a href="generator-committee.html" class="gen-col col-team">
-        <div class="icon-box">👥</div>
-        <h2>Team</h2>
-        <p>Update committee profiles.</p>
-        <div class="btn-fake">Launch Tool</div>
+        <div class="content-wrapper">
+            <div class="icon-box">👥</div>
+            <h2>Team</h2>
+            <p>Update committee profiles.</p>
+            <div class="btn-fake">Launch</div>
+        </div>
     </a>
 
     <a href="generator-report.html" class="gen-col col-fin">
-        <div class="icon-box">📊</div>
-        <h2>Report</h2>
-        <p>Weekly transparency reports.</p>
-        <div class="btn-fake">Launch Tool</div>
+        <div class="content-wrapper">
+            <div class="icon-box">📊</div>
+            <h2>Report</h2>
+            <p>Weekly transparency reports.</p>
+            <div class="btn-fake">Launch</div>
+        </div>
     </a>
 
     <a href="generator-sponsors.html" class="gen-col col-spon">
-        <div class="icon-box">🤝</div>
-        <h2>Sponsors</h2>
-        <p>Manage corporate partners.</p>
-        <div class="btn-fake">Launch Tool</div>
+        <div class="content-wrapper">
+            <div class="icon-box">🤝</div>
+            <h2>Sponsors</h2>
+            <p>Manage corporate partners.</p>
+            <div class="btn-fake">Launch</div>
+        </div>
     </a>
 
     <a href="easyeraser.html" class="gen-col col-del">
-        <div class="icon-box">🗑️</div>
-        <h2>Eraser</h2>
-        <p>Delete content from the database.</p>
-        <div class="btn-fake">Launch Tool</div>
+        <div class="content-wrapper">
+            <div class="icon-box">🗑️</div>
+            <h2>Eraser</h2>
+            <p>Delete content from the database.</p>
+            <div class="btn-fake">Launch</div>
+        </div>
     </a>
 
 </body>

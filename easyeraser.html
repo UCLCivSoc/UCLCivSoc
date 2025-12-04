@@ -3,175 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <title>Easy Eraser</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        :root { --bg-dark: #0f0f13; --panel: rgba(30, 30, 35, 0.6); --accent: #ff4444; --text: #eee; --border: rgba(255,255,255,0.1); }
-        body { background: var(--bg-dark); background-image: radial-gradient(circle at 50% 50%, rgba(255, 68, 68, 0.1) 0%, transparent 60%); color: var(--text); font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
-        .back-link { color: #888; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
-        .back-link:hover { color: white; }
-        .nav-title { font-weight: 900; letter-spacing: 1px; color: var(--accent); }
-        .logout-btn { background: transparent; border: 1px solid #444; color: #888; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        :root { 
+            --bg: #121214;
+            --surface: #1e1e24;
+            --surface-hover: #272730;
+            --border: #333;
+            --danger: #ff4444; 
+            --text: #e1e1e6; 
+            --text-muted: #a8a8b3;
+            --radius: 8px;
+            --font-sans: 'Inter', -apple-system, sans-serif;
+        }
 
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; height: calc(100vh - 100px); display: flex; flex-direction: column; }
-        
-        .selector-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .col-btn { 
-            flex: 1; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
-            color: #aaa; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 8px; transition: 0.2s;
-        }
-        .col-btn.active { background: var(--accent); color: black; border-color: var(--accent); }
+        * { box-sizing: border-box; outline: none; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font-sans); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .list-container { 
-            flex-grow: 1; overflow-y: auto; background: var(--panel); 
-            border: 1px solid var(--border); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px);
+        .top-bar { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--surface); }
+        .nav-left a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .nav-left a:hover { color: var(--text); }
+
+        .workspace { display: flex; flex: 1; height: calc(100vh - 60px); }
+        .sidebar { width: 300px; background: var(--surface); border-right: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .content-area { flex: 1; padding: 40px; overflow-y: auto; }
+
+        h2 { margin: 0 0 20px 0; font-size: 1.2rem; }
+
+        .collection-btn {
+            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+            padding: 15px; border-radius: var(--radius); cursor: pointer; text-align: left;
+            font-weight: 600; transition: 0.2s;
         }
+        .collection-btn:hover { background: var(--surface-hover); color: var(--text); border-color: #555; }
+        .collection-btn.active { background: var(--surface-hover); border-color: var(--danger); color: var(--text); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .item-card { 
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
+            padding: 20px; position: relative; transition: 0.2s; 
+        }
+        .item-card:hover { border-color: #555; transform: translateY(-2px); }
         
-        .item-row { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
-        }
-        .item-row:hover { background: rgba(255,255,255,0.05); }
-        .item-info { flex-grow: 1; }
-        .item-title { font-weight: bold; font-size: 1.1rem; color: white; margin-bottom: 5px; }
-        .item-sub { color: #888; font-size: 0.85rem; }
+        .card-title { font-weight: 700; margin-bottom: 5px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-id { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; margin-bottom: 15px; }
         
-        .del-btn { 
-            background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); 
-            color: #ff4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;
+        .delete-btn { 
+            width: 100%; padding: 8px; background: rgba(255, 68, 68, 0.1); color: var(--danger); 
+            border: 1px solid rgba(255, 68, 68, 0.2); border-radius: 4px; cursor: pointer; 
+            font-weight: 600; font-size: 0.8rem; transition: 0.2s;
         }
-        .del-btn:hover { background: #ff4444; color: white; }
+        .delete-btn:hover { background: var(--danger); color: white; }
+
+        .loading { text-align: center; color: var(--text-muted); font-style: italic; margin-top: 50px; }
     </style>
-    
-    <!-- Scripts -->
+
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
 </head>
 <body>
+    <div class="top-bar">
+        <div class="nav-left"><a href="easygenerator.html">← Generator Hub</a></div>
+        <div style="font-weight:700; letter-spacing:1px; color:#fff;">DATABASE ERASER</div>
+        <button onclick="logout()" style="background:transparent;border:1px solid #444;color:#888;padding:5px 10px;border-radius:4px;cursor:pointer;">Logout</button>
+    </div>
 
-    <nav class="nav-bar">
-        <a href="easygenerator.html" class="back-link">← Return to Hub</a>
-        <div class="nav-title">EASY ERASER</div>
-        <button onclick="logout()" class="logout-btn">Logout</button>
-    </nav>
-
-    <div class="container">
-        <div class="selector-bar">
-            <button class="col-btn active" onclick="loadCollection('posts', this)">Posts</button>
-            <button class="col-btn" onclick="loadCollection('committee', this)">Committee</button>
-            <button class="col-btn" onclick="loadCollection('reports', this)">Reports</button>
-            <button class="col-btn" onclick="loadCollection('sponsors', this)">Sponsors</button>
+    <div class="workspace">
+        <div class="sidebar">
+            <div style="color:#666; font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:10px;">Select Collection</div>
+            <button class="collection-btn" onclick="loadCollection('posts', this)">Posts (News)</button>
+            <button class="collection-btn" onclick="loadCollection('committee', this)">Committee</button>
+            <button class="collection-btn" onclick="loadCollection('reports', this)">Reports</button>
+            <button class="collection-btn" onclick="loadCollection('sponsors', this)">Sponsors</button>
         </div>
-        
-        <div id="list-view" class="list-container">
-            <div style="text-align:center; margin-top:50px; color:#666;">Loading...</div>
+
+        <div class="content-area">
+            <h2 id="col-title">Select a collection to manage items</h2>
+            <div id="grid-container" class="grid"></div>
         </div>
     </div>
 
     <script>
         let db;
-        let currentCollection = 'posts';
+        checkAuth((user) => { db = firebase.firestore(); });
+        let currentCol = '';
 
-        checkAuth((user) => {
-            db = firebase.firestore();
-            loadCollection('posts', document.querySelector('.col-btn.active'));
-        });
-
-        function loadCollection(colName, btn) {
-            currentCollection = colName;
+        async function loadCollection(col, btn) {
+            currentCol = col;
+            document.querySelectorAll('.collection-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
-            // UI Toggle
-            document.querySelectorAll('.col-btn').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
+            document.getElementById('col-title').innerText = "Manage " + col.charAt(0).toUpperCase() + col.slice(1);
+            const grid = document.getElementById('grid-container');
+            grid.innerHTML = '<div class="loading">Loading items...</div>';
 
-            const list = document.getElementById('list-view');
-            list.innerHTML = `<div style="text-align:center; margin-top:50px; color:#888;">Fetching ${colName}...</div>`;
-
-            db.collection(colName).orderBy('createdAt', 'desc').get().then(snap => {
+            try {
+                const snap = await db.collection(col).get();
+                grid.innerHTML = '';
                 if(snap.empty) {
-                    list.innerHTML = `<div style="text-align:center; margin-top:50px; color:#666;">No items found in ${colName}.</div>`;
+                    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#666;">No items found in this collection.</div>';
                     return;
                 }
 
-                list.innerHTML = '';
                 snap.forEach(doc => {
                     const data = doc.data();
-                    const id = doc.id;
+                    const title = data.title || data.name || data.label || "Untitled Item";
                     
-                    let title = "Unknown Item";
-                    let sub = id;
-
-                    // Display Logic based on type
-                    if(colName === 'posts') {
-                        title = data.title || "Untitled Post";
-                        sub = `Date: ${data.date} | Type: ${data.type}`;
-                    } else if(colName === 'committee') {
-                        title = data.name || "Unknown Member";
-                        sub = data.role || "No Role";
-                    } else if(colName === 'reports') {
-                        title = data.label || "Weekly Report";
-                        sub = `Stats: ${data.stats?.attendance || '?'} Present`;
-                    } else if(colName === 'sponsors') {
-                        title = data.name || "Sponsor";
-                        sub = data.url;
-                    }
-
-                    const div = document.createElement('div');
-                    div.className = 'item-row';
-                    div.innerHTML = `
-                        <div class="item-info">
-                            <div class="item-title">${title}</div>
-                            <div class="item-sub">${sub}</div>
-                        </div>
-                        <button class="del-btn" onclick="deleteItem('${colName}', '${id}', this)">DELETE</button>
+                    const el = document.createElement('div');
+                    el.className = 'item-card';
+                    el.innerHTML = `
+                        <div class="card-title">${title}</div>
+                        <div class="card-id">ID: ${doc.id}</div>
+                        <button class="delete-btn" onclick="deleteItem('${doc.id}', this)">DELETE PERMANENTLY</button>
                     `;
-                    list.appendChild(div);
+                    grid.appendChild(el);
                 });
-            }).catch(err => {
-                // If orderBy fails (missing index), try without it
-                console.warn("Index might be missing, trying simple fetch", err);
-                db.collection(colName).get().then(snap => {
-                     // Same rendering logic (simplified for brevity here, assume recursion or copy-paste)
-                     // Re-running render logic for fallback
-                     if(snap.empty) {
-                        list.innerHTML = `<div style="text-align:center; margin-top:50px; color:#666;">No items found in ${colName}.</div>`;
-                        return;
-                    }
-                    list.innerHTML = '';
-                    snap.forEach(doc => {
-                         const data = doc.data();
-                         let title = data.title || data.name || data.label || "Item";
-                         let sub = doc.id;
-                         const div = document.createElement('div');
-                         div.className = 'item-row';
-                         div.innerHTML = `<div class="item-info"><div class="item-title">${title}</div><div class="item-sub">${sub}</div></div><button class="del-btn" onclick="deleteItem('${colName}', '${doc.id}', this)">DELETE</button>`;
-                         list.appendChild(div);
-                    });
-                });
-            });
+            } catch(e) {
+                console.error(e);
+                grid.innerHTML = '<div style="color:red">Error loading collection.</div>';
+            }
         }
 
-        function deleteItem(col, id, btn) {
-            if(!confirm("Are you sure you want to PERMANENTLY delete this item?")) return;
+        async function deleteItem(id, btn) {
+            if(!confirm("Are you sure? This cannot be undone.")) return;
             
-            const originalText = btn.innerText;
-            btn.innerText = "...";
-            btn.disabled = true;
-
-            db.collection(col).doc(id).delete().then(() => {
-                // Remove row
-                btn.closest('.item-row').style.opacity = '0';
-                setTimeout(() => btn.closest('.item-row').remove(), 300);
-            }).catch(err => {
-                alert("Error deleting: " + err.message);
-                btn.innerText = originalText;
-                btn.disabled = false;
-            });
+            btn.innerText = "DELETING..."; btn.disabled = true;
+            try {
+                await db.collection(currentCol).doc(id).delete();
+                // Remove card from UI
+                btn.closest('.item-card').style.opacity = '0';
+                setTimeout(() => btn.closest('.item-card').remove(), 300);
+            } catch(e) {
+                console.error(e); alert("Delete failed: " + e.message);
+                btn.innerText = "DELETE FAILED";
+            }
         }
     </script>
 </body>
