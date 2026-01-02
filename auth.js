@@ -1,12 +1,9 @@
 // Authentication Utility using Firebase Google Sign-In
 // Requires: firebase-app, firebase-auth scripts to be loaded first
 
-// Hardcoded list of allowed admin emails, matching Firestore security rules
-const ALLOWED_ADMINS = [
-    "uclcivilengineeringsociety@gmail.com",
-    "alexandrefedala87@gmail.com",
-    "accardomichele06@gmail.com"
-];
+// NOTE: The Admin Whitelist is now managed EXCLUSIVELY in the Firebase Console (Security Rules).
+// This prevents "sync errors" where this file blocks valid admins.
+// To add/remove admins, edit the 'Firestore Rules' in the Firebase Console.
 
 function checkAuth(callback) {
     if (!firebase.apps.length) {
@@ -20,15 +17,9 @@ function checkAuth(callback) {
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            // Check if email is in the allowed list
-            if (ALLOWED_ADMINS.includes(user.email)) {
-                console.log("User authorized:", user.email);
-                if (callback) callback(user);
-            } else {
-                console.warn("User unauthorized:", user.email);
-                // Redirect to error page
-                window.location.href = 'error.html';
-            }
+            console.log("User authenticated:", user.email);
+            if (callback) callback(user);
+            
         } else {
             console.log("User not logged in. Redirecting to login...");
             redirectToLogin();
@@ -38,9 +29,6 @@ function checkAuth(callback) {
 
 function redirectToLogin() {
     // Simple overlay or redirect
-    // For now, let's use a Google Sign In prompt directly if possible, 
-    // or overlay a login button if user interaction is needed (browser popup blockers).
-    
     // We'll create a full-screen overlay forcing login.
     const overlay = document.createElement('div');
     overlay.id = 'auth-overlay';
@@ -78,7 +66,7 @@ function redirectToLogin() {
             .then((result) => {
                 // Auth successful
                 overlay.remove();
-                // The onAuthStateChanged listener will handle the rest (check email and redirect if needed)
+                // The onAuthStateChanged listener will handle the rest
             })
             .catch((error) => {
                 const errEl = document.getElementById('auth-error');
